@@ -1,0 +1,10 @@
+<<<<<<< HEAD
+# Local changes
+node_modules/
+build/
+.env
+=======
+# Remote changes
+target/
+.DS_Store
+>>>>>>> origin/master
