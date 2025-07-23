@@ -1,27 +1,26 @@
 import React, { useContext } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link, useNavigate } from "react-router-dom";
-import "bootstrap-icons/font/bootstrap-icons.css";
 import "./sidebar.css";
 import axios from "axios";
 import UserContext from "../Context/userContext";
 
 const NavBarTeacher = () => {
+  const { setUserName } = useContext(UserContext);
 
-  const {setUserName}=useContext(UserContext);
-
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const handleLogout = () => {
-    axios.post('http://localhost:8081/auth/logout')
+    axios
+      .post("http://localhost:8081/auth/logout")
       .then((response) => {
-      if(response.data.logout==="Logout Successfull"){
-          console.log('Logged out successfully');
+        if (response.data.logout === "Logout Successfull") {
+          console.log("Logged out successfully");
           setUserName(null);
-          navigate('/');
+          navigate("/");
         }
       })
       .catch((error) => {
-        console.log('Error logging out:', error);
+        console.log("Error logging out:", error);
       });
   };
 
@@ -33,27 +32,39 @@ const NavBarTeacher = () => {
       </div>
       <hr className="text-dark" />
       <div className="list-group list-group-flush">
-        <Link to='/' className="list-group-item py-2 rounded sidelink" >
+        <Link to="/" className="list-group-item py-2 rounded sidelink">
           <i className="bi bi-house fs-5 me-3"></i>
-          <span >Home</span>
+          <span>Home</span>
         </Link>
-        <Link to='/createtestpage' className="list-group-item py-2 rounded sidelink">
+        <Link
+          to="/createtestpage"
+          className="list-group-item py-2 rounded sidelink"
+        >
           <i className="bi bi-plus-lg fs-5 me-3"></i>
-          <span >CreateTest</span>
+          <span>CreateTest</span>
         </Link>
-       
-        <Link to='/reportteacher' className="list-group-item py-2 rounded sidelink">
+
+        <Link
+          to="/reportteacher"
+          className="list-group-item py-2 rounded sidelink"
+        >
           <i className="bi bi-clipboard-data fs-5 me-3"></i>
-          <span >Report</span>
+          <span>Report</span>
         </Link>
-      
-        <Link to='/profileteacher' className="list-group-item py-2 rounded sidelink">
+
+        <Link
+          to="/profileteacher"
+          className="list-group-item py-2 rounded sidelink"
+        >
           <i className="bi bi-person fs-5 me-3"></i>
-          <span >Profile</span>
+          <span>Profile</span>
         </Link>
-        <button onClick={handleLogout} className="list-group-item py-2 rounded btn sidelink">
+        <button
+          onClick={handleLogout}
+          className="list-group-item py-2 rounded btn sidelink"
+        >
           <i className="bi bi-power fs-5 me-3"></i>
-          <span style={{marginRight:'100px'}}>Logout</span>
+          <span style={{ marginRight: "100px" }}>Logout</span>
         </button>
       </div>
     </div>

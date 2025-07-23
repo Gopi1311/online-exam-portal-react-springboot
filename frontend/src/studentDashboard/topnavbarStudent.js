@@ -1,19 +1,19 @@
-import React, { useContext} from "react";
+import React, { useContext } from "react";
 import "bootstrap/js/dist/dropdown";
 import "bootstrap/js/dist/collapse";
 import UserContext from "../Context/userContext";
 
 const TopNavStudent = ({ Toggle }) => {
- 
-  const {userName}=useContext(UserContext);
- 
+  const { userName } = useContext(UserContext);
+
   return (
     <nav
       className="navbar navbar-expand-sm navbar-white px-3  "
       style={{ backgroundColor: "#052659", color: "#c1e8ff" }}
     >
       <i
-        className="navbar-brand bi bi-justify-left fs-4 text-white " style={{cursor: "pointer"}}
+        className="navbar-brand bi bi-justify-left fs-4 text-white "
+        style={{ cursor: "pointer" }}
         onClick={Toggle}
       ></i>
       <h2>Student DashBoard</h2>

@@ -1,8 +1,6 @@
-
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useParams, useNavigate } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useParams, useNavigate } from "react-router-dom";
 
 const StatusStudent = () => {
   const [testResults, setTestResults] = useState([]);
@@ -12,15 +10,15 @@ const StatusStudent = () => {
 
   useEffect(() => {
     const fetchResult = async () => {
-      
-      await axios.get(`http://localhost:8081/mark/status/${id}`)
+      await axios
+        .get(`http://localhost:8081/mark/status/${id}`)
         .then((res) => {
           setTestResults(res.data.marks);
           setTestName(res.data.testName);
           console.log(res.data);
         })
-        .catch(error => {
-          console.error('Error fetching test results:', error);
+        .catch((error) => {
+          console.error("Error fetching test results:", error);
         });
     };
 
@@ -28,16 +26,18 @@ const StatusStudent = () => {
   }, [id]);
 
   const handleBackButtonClick = () => {
-    navigate('/studenthomedash');
+    navigate("/studenthomedash");
   };
 
   return (
     <div className="container mt-4">
-     
       <div className="card">
-        <div className="card-body rounded overflow-hidden" style={{backgroundColor:'#7da0ca'}}>
+        <div
+          className="card-body rounded overflow-hidden"
+          style={{ backgroundColor: "#7da0ca" }}
+        >
           <div className="table-responsive">
-          <h2 className="text-center mb-4">Test Results</h2>
+            <h2 className="text-center mb-4">Test Results</h2>
             <table className="table table-bordered table-hover table-striped rounded overflow-hidden">
               <thead className="thead-light">
                 <tr>
@@ -59,13 +59,18 @@ const StatusStudent = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="4" className="text-center">No test results found</td>
+                    <td colSpan="4" className="text-center">
+                      No test results found
+                    </td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
-          <button className="btn btn-secondary mt-3" onClick={handleBackButtonClick}>
+          <button
+            className="btn btn-secondary mt-3"
+            onClick={handleBackButtonClick}
+          >
             Go Back
           </button>
         </div>

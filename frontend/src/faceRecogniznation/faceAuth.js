@@ -8,8 +8,8 @@ const FacialRecognition = () => {
   const webcamRef = useRef(null);
   const [modelsLoaded, setModelsLoaded] = useState(false);
   const [imageSrc, setImageSrc] = useState(null);
-  const {id}=useParams();
-  const navigate=useNavigate();
+  const { id } = useParams();
+  const navigate = useNavigate();
   // Load FaceAPI models
   useEffect(() => {
     const loadModels = async () => {
@@ -67,22 +67,30 @@ const FacialRecognition = () => {
 
       // Detect and compare faces
       const capturedFace = await faceapi
-        .detectSingleFace(capturedImgElement, new faceapi.TinyFaceDetectorOptions())
+        .detectSingleFace(
+          capturedImgElement,
+          new faceapi.TinyFaceDetectorOptions()
+        )
         .withFaceLandmarks()
         .withFaceDescriptor();
 
       const profileFace = await faceapi
-        .detectSingleFace(profileImgElement, new faceapi.TinyFaceDetectorOptions())
+        .detectSingleFace(
+          profileImgElement,
+          new faceapi.TinyFaceDetectorOptions()
+        )
         .withFaceLandmarks()
         .withFaceDescriptor();
 
       if (capturedFace && profileFace) {
-        const distance = faceapi.euclideanDistance(capturedFace.descriptor, profileFace.descriptor);
+        const distance = faceapi.euclideanDistance(
+          capturedFace.descriptor,
+          profileFace.descriptor
+        );
         console.log("Face distance:", distance);
         if (distance < 0.6) {
           alert("Face recognized!");
           navigate(`/examinstruction/${id}`);
-          
         } else {
           alert("Face not recognized!");
         }
@@ -96,31 +104,36 @@ const FacialRecognition = () => {
 
   return (
     <div className="container d-flex justify-content-center align-items-center vh-100">
-    <div className="card shadow-lg p-4" style={{ width: "100%", maxWidth: "500px" }}>
-      <h2 className="text-center mb-4">Facial Recognition Login</h2>
-      {modelsLoaded ? (
-        <div className="webcam-container mb-4">
-          <Webcam ref={webcamRef} screenshotFormat="image/jpeg" className="w-100 rounded" />
-        </div>
-      ) : (
-        <div className="d-flex justify-content-center mb-4">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading...</span>
+      <div
+        className="card shadow-lg p-4"
+        style={{ width: "100%", maxWidth: "500px" }}
+      >
+        <h2 className="text-center mb-4">Facial Recognition Login</h2>
+        {modelsLoaded ? (
+          <div className="webcam-container mb-4">
+            <Webcam
+              ref={webcamRef}
+              screenshotFormat="image/jpeg"
+              className="w-100 rounded"
+            />
           </div>
+        ) : (
+          <div className="d-flex justify-content-center mb-4">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        )}
+        <div className="text-center">
+          <Link to={"/studenthomedash"} className="btn btn-danger me-2">
+            Back
+          </Link>
+          <button className="btn btn-success" onClick={capture}>
+            Capture Face
+          </button>
         </div>
-      )}
-      <div className="text-center">
-      <Link to={'/studenthomedash'}className="btn btn-danger me-2" >
-          Back
-        </Link>
-        <button className="btn btn-success" onClick={capture}>
-          Capture Face
-        </button>
-        
       </div>
     </div>
-  </div>
-  
   );
 };
 
