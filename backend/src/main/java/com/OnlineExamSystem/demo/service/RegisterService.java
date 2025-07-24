@@ -29,33 +29,28 @@ public class RegisterService {
         return registerRepo.save(register);
     }
 
-    public Map<String,Object> userLogin(Register register,HttpSession session) {
-        Optional<Register> optional=registerRepo.findByEmail(register.getEmail());
-        if (optional.isPresent()){
-            Register register1=optional.get();
-            if(register1.getPassword().equals(register.getPassword())){
-                session.setAttribute("userId",register1.getId());
-                Map<String,Object> response=new HashMap<>();
-                response.put("message","Login Success");
-                response.put("userId",register1.getId());
-                response.put("role",register1.getRole());
-                response.put("userName",register1.getName());
+    public Map<String, Object> userLogin(Register register, HttpSession session) {
+        Optional<Register> optional = registerRepo.findByEmail(register.getEmail());
+        if (optional.isPresent()) {
+            Register register1 = optional.get();
+            if (register1.getPassword().equals(register.getPassword())) {
+                session.setAttribute("userId", register1.getId());
+                Map<String, Object> response = new HashMap<>();
+                response.put("message", "Login Success");
+                response.put("userId", register1.getId());
+                response.put("role", register1.getRole());
+                response.put("userName", register1.getName());
                 return response;
+            } else {
+                throw new RuntimeException("Invalid Password");
             }
-            else {
-                throw  new RuntimeException("Invalid Password");
-            }
-        }
-        else {
+        } else {
             throw new RuntimeException("User Not Found");
         }
 
     }
 
-
     public Register userProfile(Long userId) {
-        return registerRepo.findById(userId).orElseThrow(()-> new RuntimeException("User Not Found"));
+        return registerRepo.findById(userId).orElseThrow(() -> new RuntimeException("User Not Found"));
     }
-
-
 }

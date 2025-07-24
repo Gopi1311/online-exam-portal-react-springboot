@@ -1,7 +1,7 @@
 package com.OnlineExamSystem.demo.controller;
 
 
-import com.OnlineExamSystem.demo.model.dto.MarkStatusDTO;
+import com.OnlineExamSystem.demo.dto.MarkStatusDTO;
 
 import com.OnlineExamSystem.demo.service.MarkService;
 import jakarta.servlet.http.HttpSession;
@@ -13,9 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/mark")
@@ -25,18 +23,18 @@ public class MarkController {
     private MarkService markService;
 
     @GetMapping("/status/{id}")
-    public ResponseEntity<MarkStatusDTO> markStatus(@PathVariable Long id, HttpSession session){
-            try{
-                Long userId= (Long) session.getAttribute("userId");
-                if(userId==null){
-                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-                }
-               MarkStatusDTO markStatusDTO= markService.reportByTestId(id,userId);
-                System.out.println(markStatusDTO);
-                return new ResponseEntity<>(markStatusDTO,HttpStatus.OK);
-            } catch (RuntimeException e) {
-                throw new RuntimeException(e);
+    public ResponseEntity<MarkStatusDTO> markStatus(@PathVariable Long id, HttpSession session) {
+        try {
+            Long userId = (Long) session.getAttribute("userId");
+            if (userId == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
+            MarkStatusDTO markStatusDTO = markService.reportByTestId(id, userId);
+            System.out.println(markStatusDTO);
+            return new ResponseEntity<>(markStatusDTO, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -56,21 +54,20 @@ public class MarkController {
     }
 
     @GetMapping("/teacherReport")
-    public ResponseEntity<List<Map<String,Object>>> teacherReport(HttpSession session){
-        try{
-            Long userId= (Long) session.getAttribute("userId");
+    public ResponseEntity<List<Map<String, Object>>> teacherReport(HttpSession session) {
+        try {
+            Long userId = (Long) session.getAttribute("userId");
             System.out.println("User ID from session: " + userId);
-            if(userId==null){
+            if (userId == null) {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
-            List<Map<String,Object>> studentMarks=markService.teacherReport(userId);
-            System.out.println("Test : "+studentMarks);
-            return new ResponseEntity<>(studentMarks,HttpStatus.OK);
+            List<Map<String, Object>> studentMarks = markService.teacherReport(userId);
+            System.out.println("Test : " + studentMarks);
+            return new ResponseEntity<>(studentMarks, HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
 
 }

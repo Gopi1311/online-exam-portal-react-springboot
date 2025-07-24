@@ -1,4 +1,4 @@
-package com.OnlineExamSystem.demo.model.dto;
+package com.OnlineExamSystem.demo.dto;
 
 import com.OnlineExamSystem.demo.model.Test;
 import lombok.NoArgsConstructor;
@@ -22,7 +22,7 @@ public class TestDetailResponse {
     }
 
     public TestDetailResponse(Long testId, String testname, List<Test> tests) {
-        this.testId=testId;
+        this.testId = testId;
         this.testname = testname;
         this.tests = tests;
     }

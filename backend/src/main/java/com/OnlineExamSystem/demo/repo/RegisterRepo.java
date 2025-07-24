@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface RegisterRepo extends JpaRepository<Register,Long> {
+public interface RegisterRepo extends JpaRepository<Register, Long> {
     Optional<Register> findByEmail(String email);
 }

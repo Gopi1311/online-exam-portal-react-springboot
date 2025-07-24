@@ -35,7 +35,7 @@ public class TestDetail {
                 '}';
     }
 
-    @OneToMany(mappedBy = "testDetail", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "testDetail", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonIgnoreProperties("testDetail")
     private List<Test> tests;
 

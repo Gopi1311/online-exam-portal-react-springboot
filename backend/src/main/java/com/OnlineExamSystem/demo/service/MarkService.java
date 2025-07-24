@@ -1,7 +1,7 @@
 package com.OnlineExamSystem.demo.service;
 
 
-import com.OnlineExamSystem.demo.model.dto.MarkStatusDTO;
+import com.OnlineExamSystem.demo.dto.MarkStatusDTO;
 import com.OnlineExamSystem.demo.model.Mark;
 import com.OnlineExamSystem.demo.model.Register;
 import com.OnlineExamSystem.demo.model.TestDetail;

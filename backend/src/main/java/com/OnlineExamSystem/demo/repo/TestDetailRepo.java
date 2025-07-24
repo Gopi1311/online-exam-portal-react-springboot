@@ -9,10 +9,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface TestDetailRepo extends JpaRepository<TestDetail,Long> {
+public interface TestDetailRepo extends JpaRepository<TestDetail, Long> {
 
 
-@Query("SELECT t FROM TestDetail t WHERE t.teacher.id = :teacherId")
-List<TestDetail> findByTeacherId(@Param("teacherId") Long teacherId);
+    @Query("SELECT t FROM TestDetail t WHERE t.teacher.id = :teacherId")
+    List<TestDetail> findByTeacherId(@Param("teacherId") Long teacherId);
 
 }

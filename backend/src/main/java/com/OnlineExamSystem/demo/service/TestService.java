@@ -1,7 +1,7 @@
 package com.OnlineExamSystem.demo.service;
 
-import com.OnlineExamSystem.demo.model.dto.TestDetailResponse;
-import com.OnlineExamSystem.demo.model.dto.TestRequest;
+import com.OnlineExamSystem.demo.dto.TestDetailResponse;
+import com.OnlineExamSystem.demo.dto.TestRequest;
 
 import com.OnlineExamSystem.demo.model.Mark;
 import com.OnlineExamSystem.demo.model.Register;
@@ -14,8 +14,7 @@ import com.OnlineExamSystem.demo.repo.TestRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,14 +33,14 @@ public class TestService {
 
 
     public void saveTest(TestRequest testRequest, Long userId) {
-        TestDetail testDetail=new TestDetail();
+        TestDetail testDetail = new TestDetail();
         testDetail.setTestname(testRequest.getTestname());
-        Register register=registerRepo.findById(userId).orElseThrow(()->new RuntimeException("Teacher not found with id: " + userId));
+        Register register = registerRepo.findById(userId).orElseThrow(() -> new RuntimeException("Teacher not found with id: " + userId));
         testDetail.setTeacher(register);
-        TestDetail saveTestDetail=testDetailRepo.save(testDetail);
+        TestDetail saveTestDetail = testDetailRepo.save(testDetail);
 
         List<Test> questions = testRequest.getQuestions().stream().map(q -> {
-            Test test=new Test();
+            Test test = new Test();
             test.setQuestion(q.getQuestion());
             test.setOption1(q.getOption1());
             test.setOption2(q.getOption2());
@@ -64,17 +63,17 @@ public class TestService {
     }
 
     public TestDetailResponse testById(Long id) {
-        TestDetail testDetail=testDetailRepo.findById(id).orElseThrow(()->new RuntimeException("TestDetails Not Found By ID"));
-        List<Test> tests=testRepo.findByTestDetail(testDetail);
-        return new TestDetailResponse(testDetail.getId(),testDetail.getTestname(),tests);
+        TestDetail testDetail = testDetailRepo.findById(id).orElseThrow(() -> new RuntimeException("TestDetails Not Found By ID"));
+        List<Test> tests = testRepo.findByTestDetail(testDetail);
+        return new TestDetailResponse(testDetail.getId(), testDetail.getTestname(), tests);
     }
 
 
     public void updateTestById(Long id, TestDetailResponse testDetailResponse) {
-        TestDetail testDetail=testDetailRepo.findById(id).orElseThrow(()->new RuntimeException("TestDetails Not Founnd By ID"));
+        TestDetail testDetail = testDetailRepo.findById(id).orElseThrow(() -> new RuntimeException("TestDetails Not Founnd By ID"));
         testDetail.setTestname(testDetailResponse.getTestname());
-        List<Test> updateTest=testDetailResponse.getTests() != null
-                ? testDetailResponse.getTests().stream().map(q->{
+        List<Test> updateTest = testDetailResponse.getTests() != null
+                ? testDetailResponse.getTests().stream().map(q -> {
             Test existingTest = testRepo.findById(q.getId())
                     .orElseThrow(() -> new RuntimeException("Test Not Found By ID: " + q.getId()));
             existingTest.setQuestion(q.getQuestion());
@@ -85,15 +84,16 @@ public class TestService {
             existingTest.setAnswer(q.getAnswer());
             existingTest.setLevel(q.getLevel());
             return existingTest;
-        }).collect(Collectors.toList()): Collections.emptyList();;
+        }).collect(Collectors.toList()) : Collections.emptyList();
+        ;
         testRepo.saveAll(updateTest);
         testDetailRepo.save(testDetail);
 
     }
 
     public void deleteTestById(Long id) {
-        TestDetail testDetailResponse=testDetailRepo.findById(id)
-                .orElseThrow(()->new RuntimeException("TestDetail Not Found By ID"));
+        TestDetail testDetailResponse = testDetailRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("TestDetail Not Found By ID"));
         testDetailRepo.delete(testDetailResponse);
 
     }
@@ -103,9 +103,9 @@ public class TestService {
     }
 
     public void submitTest(Long id, Long userId, Mark marks) {
-        Register register=registerRepo.findById(userId).orElseThrow(()->new RuntimeException("User ID Not Found"));
-        TestDetail testDetail=testDetailRepo.findById(id).orElseThrow(()->new RuntimeException("TestDetail Not Found By ID"));
-        Mark mark=new Mark();
+        Register register = registerRepo.findById(userId).orElseThrow(() -> new RuntimeException("User ID Not Found"));
+        TestDetail testDetail = testDetailRepo.findById(id).orElseThrow(() -> new RuntimeException("TestDetail Not Found By ID"));
+        Mark mark = new Mark();
         mark.setCheatingCount(marks.getCheatingCount());
         mark.setUserid(register);
         mark.setTestDetail(testDetail);

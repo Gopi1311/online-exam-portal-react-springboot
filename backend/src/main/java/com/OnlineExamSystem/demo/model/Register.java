@@ -29,7 +29,7 @@ public class Register {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL)
-    private List<TestDetail> testDetails ;
+    private List<TestDetail> testDetails;
 
     public Long getId() {
         return id;
@@ -123,11 +123,9 @@ public class Register {
     private byte[] image;
 
 
-
     public enum Role {
         student, teacher
     }
-
 
 
 }

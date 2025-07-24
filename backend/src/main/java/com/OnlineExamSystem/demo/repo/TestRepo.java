@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface TestRepo extends JpaRepository<Test,Long> {
+public interface TestRepo extends JpaRepository<Test, Long> {
 
     List<Test> findByTestDetail(TestDetail testDetail);
 }

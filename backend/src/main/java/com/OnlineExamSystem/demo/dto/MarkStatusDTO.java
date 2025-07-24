@@ -1,4 +1,4 @@
-package com.OnlineExamSystem.demo.model.dto;
+package com.OnlineExamSystem.demo.dto;
 
 import com.OnlineExamSystem.demo.model.Mark;
 
