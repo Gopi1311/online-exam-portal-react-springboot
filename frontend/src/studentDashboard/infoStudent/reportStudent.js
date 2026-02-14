@@ -77,7 +77,7 @@ const ReportStudent = () => {
                       >
                         {percentage}% - {getSkillMessage(percentage)}
                       </td>
-                      <td>{new Date(mark.Date).toLocaleDateString()}</td>
+                      <td>{new Date(mark.date).toLocaleDateString()}</td>
                     </tr>
                   );
                 })}

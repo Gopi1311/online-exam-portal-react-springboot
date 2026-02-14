@@ -2,7 +2,6 @@ package com.OnlineExamSystem.demo.service;
 
 import com.OnlineExamSystem.demo.dto.TestDetailResponse;
 import com.OnlineExamSystem.demo.dto.TestRequest;
-
 import com.OnlineExamSystem.demo.model.Mark;
 import com.OnlineExamSystem.demo.model.Register;
 import com.OnlineExamSystem.demo.model.Test;
@@ -11,107 +10,148 @@ import com.OnlineExamSystem.demo.repo.MarkRepo;
 import com.OnlineExamSystem.demo.repo.RegisterRepo;
 import com.OnlineExamSystem.demo.repo.TestDetailRepo;
 import com.OnlineExamSystem.demo.repo.TestRepo;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class TestService {
 
-    @Autowired
-    private RegisterRepo registerRepo;
-    @Autowired
-    private TestDetailRepo testDetailRepo;
+    private final RegisterRepo registerRepo;
+    private final TestDetailRepo testDetailRepo;
+    private final TestRepo testRepo;
+    private final MarkRepo markRepo;
 
-    @Autowired
-    private TestRepo testRepo;
+    // ========================================================================
+    // CREATE TEST
+    // ========================================================================
+    public void saveTest(TestRequest request, Long teacherId) {
 
-    @Autowired
-    private MarkRepo markRepo;
+        Register teacher = registerRepo.findById(teacherId)
+                .orElseThrow(() -> new IllegalArgumentException("Teacher not found: " + teacherId));
 
-
-    public void saveTest(TestRequest testRequest, Long userId) {
         TestDetail testDetail = new TestDetail();
-        testDetail.setTestname(testRequest.getTestname());
-        Register register = registerRepo.findById(userId).orElseThrow(() -> new RuntimeException("Teacher not found with id: " + userId));
-        testDetail.setTeacher(register);
-        TestDetail saveTestDetail = testDetailRepo.save(testDetail);
+        testDetail.setTestname(request.testname());
+        testDetail.setTeacher(teacher);
 
-        List<Test> questions = testRequest.getQuestions().stream().map(q -> {
-            Test test = new Test();
-            test.setQuestion(q.getQuestion());
-            test.setOption1(q.getOption1());
-            test.setOption2(q.getOption2());
-            test.setOption3(q.getOption3());
-            test.setOption4(q.getOption4());
-            test.setAnswer(q.getAnswer());
-            test.setTestDetail(saveTestDetail);
-            test.setLevel(q.getLevel());
-            return test;
-        }).collect(Collectors.toList());
+        TestDetail savedTestDetail = testDetailRepo.save(testDetail);
+
+        List<Test> questions = request.questions().stream()
+                .map(q -> {
+                    Test t = new Test();
+                    t.setQuestion(q.question());
+                    t.setOption1(q.option1());
+                    t.setOption2(q.option2());
+                    t.setOption3(q.option3());
+                    t.setOption4(q.option4());
+                    t.setAnswer(q.answer());
+                    t.setLevel(q.level());
+                    t.setTestDetail(savedTestDetail);
+                    return t;
+                })
+                .collect(Collectors.toList());
 
         testRepo.saveAll(questions);
-
-
     }
 
-
-    public List<TestDetail> viewAllTestByTeacher(Long userId) {
-        return testDetailRepo.findByTeacherId(userId);
+    // ========================================================================
+    // FETCH ALL TESTS FOR SPECIFIC TEACHER
+    // ========================================================================
+    public List<TestDetail> getAllTestsByTeacher(Long teacherId) {
+        return testDetailRepo.findByTeacherId(teacherId);
     }
 
-    public TestDetailResponse testById(Long id) {
-        TestDetail testDetail = testDetailRepo.findById(id).orElseThrow(() -> new RuntimeException("TestDetails Not Found By ID"));
-        List<Test> tests = testRepo.findByTestDetail(testDetail);
-        return new TestDetailResponse(testDetail.getId(), testDetail.getTestname(), tests);
+    // ========================================================================
+    // FETCH TEST WITH QUESTIONS
+    // ========================================================================
+    public TestDetailResponse getTestWithQuestions(Long testId) {
+
+        TestDetail testDetail = testDetailRepo.findById(testId)
+                .orElseThrow(() -> new IllegalArgumentException("Test not found: " + testId));
+
+        List<Test> questions = testRepo.findByTestDetail(testDetail);
+
+        return new TestDetailResponse(
+                testDetail.getId(),
+                testDetail.getTestname(),
+                questions
+        );
     }
 
+    // ========================================================================
+    // UPDATE TEST + QUESTIONS
+    // ========================================================================
+    public void updateTest(Long id, TestDetailResponse dto) {
 
-    public void updateTestById(Long id, TestDetailResponse testDetailResponse) {
-        TestDetail testDetail = testDetailRepo.findById(id).orElseThrow(() -> new RuntimeException("TestDetails Not Founnd By ID"));
-        testDetail.setTestname(testDetailResponse.getTestname());
-        List<Test> updateTest = testDetailResponse.getTests() != null
-                ? testDetailResponse.getTests().stream().map(q -> {
-            Test existingTest = testRepo.findById(q.getId())
-                    .orElseThrow(() -> new RuntimeException("Test Not Found By ID: " + q.getId()));
-            existingTest.setQuestion(q.getQuestion());
-            existingTest.setOption1(q.getOption1());
-            existingTest.setOption2(q.getOption2());
-            existingTest.setOption3(q.getOption3());
-            existingTest.setOption4(q.getOption4());
-            existingTest.setAnswer(q.getAnswer());
-            existingTest.setLevel(q.getLevel());
-            return existingTest;
-        }).collect(Collectors.toList()) : Collections.emptyList();
-        ;
-        testRepo.saveAll(updateTest);
+        TestDetail testDetail = testDetailRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Test not found: " + id));
+
+        testDetail.setTestname(dto.testname());
         testDetailRepo.save(testDetail);
 
+        if (dto.tests() == null || dto.tests().isEmpty()) {
+            return;
+        }
+
+        List<Test> updatedTests = dto.tests().stream()
+                .map(q -> {
+                    Test existing = testRepo.findById(q.getId())
+                            .orElseThrow(() -> new IllegalArgumentException("Question not found: " + q.getId()));
+
+                    existing.setQuestion(q.getQuestion());
+                    existing.setOption1(q.getOption1());
+                    existing.setOption2(q.getOption2());
+                    existing.setOption3(q.getOption3());
+                    existing.setOption4(q.getOption4());
+                    existing.setAnswer(q.getAnswer());
+                    existing.setLevel(q.getLevel());
+
+                    return existing;
+                })
+                .collect(Collectors.toList());
+
+        testRepo.saveAll(updatedTests);
     }
 
-    public void deleteTestById(Long id) {
-        TestDetail testDetailResponse = testDetailRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("TestDetail Not Found By ID"));
-        testDetailRepo.delete(testDetailResponse);
+    // ========================================================================
+    // DELETE TEST
+    // ========================================================================
+    public void deleteTest(Long id) {
+        TestDetail testDetail = testDetailRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Test not found: " + id));
 
+        testDetailRepo.delete(testDetail);
     }
 
-    public List<TestDetail> allTestList() {
+    // ========================================================================
+    // FETCH ALL TESTS
+    // ========================================================================
+    public List<TestDetail> getAllTests() {
         return testDetailRepo.findAll();
     }
 
-    public void submitTest(Long id, Long userId, Mark marks) {
-        Register register = registerRepo.findById(userId).orElseThrow(() -> new RuntimeException("User ID Not Found"));
-        TestDetail testDetail = testDetailRepo.findById(id).orElseThrow(() -> new RuntimeException("TestDetail Not Found By ID"));
-        Mark mark = new Mark();
-        mark.setCheatingCount(marks.getCheatingCount());
-        mark.setUserid(register);
-        mark.setTestDetail(testDetail);
-        mark.setMark(marks.getMark());
-        mark.setDate(marks.getDate());
-        markRepo.save(mark);
+    // ========================================================================
+    // SUBMIT TEST RESULTS
+    // ========================================================================
+    public void submitTest(Long testId, Long userId, Mark request) {
 
+        Register student = registerRepo.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+
+        TestDetail testDetail = testDetailRepo.findById(testId)
+                .orElseThrow(() -> new IllegalArgumentException("Test not found: " + testId));
+
+        Mark mark = new Mark();
+        mark.setUserid(student);
+        mark.setTestDetail(testDetail);
+        mark.setMark(request.getMark());
+        mark.setCheatingCount(request.getCheatingCount());
+        mark.setDate(request.getDate());
+
+        markRepo.save(mark);
     }
 }

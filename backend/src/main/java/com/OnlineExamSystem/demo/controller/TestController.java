@@ -1,85 +1,126 @@
 package com.OnlineExamSystem.demo.controller;
 
-
 import com.OnlineExamSystem.demo.dto.TestDetailResponse;
 import com.OnlineExamSystem.demo.dto.TestRequest;
 import com.OnlineExamSystem.demo.model.Mark;
 import com.OnlineExamSystem.demo.model.TestDetail;
 import com.OnlineExamSystem.demo.service.TestService;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
+@Slf4j
 @RestController
-@RequestMapping("/test")
+@RequestMapping("/tests")
+@RequiredArgsConstructor
 public class TestController {
 
-    @Autowired
-    private TestService testService;
 
-    @PostMapping("/save")
-    public ResponseEntity<?> saveTest(@RequestBody TestRequest testRequest, HttpSession session) {
+    private final TestService testService;
+    // ==========================================================
+    // CREATE TEST
+    // ==========================================================
+    @PostMapping
+    public ResponseEntity<?> createTest(@RequestBody TestRequest request, HttpSession session) {
 
-        Long userId = (Long) session.getAttribute("userId");
+        Long teacherId = (Long) session.getAttribute("userId");
 
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized. Please login.");
+        if (teacherId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Unauthorized. Please login.");
         }
 
         try {
-            System.out.println(testRequest);
-            testService.saveTest(testRequest, userId);
-            return ResponseEntity.ok("Test added successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            log.info("Creating test: {}", request);
+            testService.saveTest(request, teacherId);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body("Test created successfully.");
+        } catch (Exception e) {
+            log.error("Error while creating test", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to create test: " + e.getMessage());
         }
     }
 
-    @GetMapping("/view")
-    public List<TestDetail> testDetail(HttpSession session) {
-        Long userId = (Long) session.getAttribute("userId");
-        System.out.println(testService.viewAllTestByTeacher(userId));
-        return testService.viewAllTestByTeacher(userId);
+    // ==========================================================
+    // GET ALL TESTS FOR TEACHER
+    // ==========================================================
+    @GetMapping("/teacher")
+    public ResponseEntity<?> getTestsForTeacher(HttpSession session) {
+
+        Long teacherId = (Long) session.getAttribute("userId");
+
+        if (teacherId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Unauthorized. Please login.");
+        }
+
+        List<TestDetail> tests = testService.getAllTestsByTeacher(teacherId);
+        return ResponseEntity.ok(tests);
     }
 
-    @GetMapping("/getQuestions/{id}")
-    public ResponseEntity<TestDetailResponse> testById(@PathVariable Long id) {
-        TestDetailResponse response = testService.testById(id);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    // ==========================================================
+    // GET TEST WITH QUESTIONS
+    // ==========================================================
+    @GetMapping("/{id}")
+    public ResponseEntity<TestDetailResponse> getTestById(@PathVariable Long id) {
+        TestDetailResponse response = testService.getTestWithQuestions(id);
+        return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Void> testUpdate(@PathVariable Long id, @RequestBody TestDetailResponse testDetailResponse) {
-        System.out.println("Gopinath : " + testDetailResponse);
-        testService.updateTestById(id, testDetailResponse);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    // ==========================================================
+    // UPDATE TEST + QUESTIONS
+    // ==========================================================
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateTest(
+            @PathVariable Long id,
+            @RequestBody TestDetailResponse request) {
+
+        log.info("Updating test {} with data: {}", id, request);
+
+        testService.updateTest(id, request);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @DeleteMapping("/removeTest/{id}")
-    public ResponseEntity<Void> deleteTestById(@PathVariable Long id) {
-        testService.deleteTestById(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+    // ==========================================================
+    // DELETE TEST
+    // ==========================================================
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteTest(@PathVariable Long id) {
+        testService.deleteTest(id);
+        return ResponseEntity.ok("Test deleted successfully.");
     }
 
-    @GetMapping("/studentTestList")
-    public List<TestDetail> testListForStudent() {
-
-        return testService.allTestList();
-
+    // ==========================================================
+    // GET ALL TESTS (FOR STUDENT)
+    // ==========================================================
+    @GetMapping
+    public ResponseEntity<List<TestDetail>> getAllTests() {
+        return ResponseEntity.ok(testService.getAllTests());
     }
 
-    @PostMapping("/markSubmit/{id}")
-    public ResponseEntity<Void> submitTest(@PathVariable Long id, @RequestBody Mark mark, HttpSession session) {
-        Long userId = (Long) session.getAttribute("userId");
-        testService.submitTest(id, userId, mark);
-        return new ResponseEntity<>(HttpStatus.OK);
+    // ==========================================================
+    // SUBMIT TEST RESULT
+    // ==========================================================
+    @PostMapping("/{id}/submit")
+    public ResponseEntity<?> submitTest(
+            @PathVariable Long id,
+            @RequestBody Mark mark,
+            HttpSession session) {
 
+        Long studentId = (Long) session.getAttribute("userId");
+
+        if (studentId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Unauthorized. Please login.");
+        }
+
+        testService.submitTest(id, studentId, mark);
+        return ResponseEntity.ok("Test submitted successfully.");
     }
-
 }
-

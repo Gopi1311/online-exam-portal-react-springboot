@@ -15,9 +15,13 @@ import java.util.*;
 @RestController
 @RequestMapping("/auth")
 public class RegisterController {
-
     @Autowired
     private RegisterService registerService;
+
+    @GetMapping("/test")
+    public String testing() {
+        return "Working Gopinath !!";
+    }
 
     @PostMapping("/Signup")
     public ResponseEntity<?> userSignup(@RequestPart Register register, @RequestPart(value = "image", required = false) MultipartFile imageFile) {
@@ -33,11 +37,8 @@ public class RegisterController {
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> userLogin(@RequestBody Register register, HttpSession session) {
         try {
-
             Map<String, Object> response = registerService.userLogin(register, session);
-
             return ResponseEntity.ok(response);
-
         } catch (RuntimeException e) {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("error", e.getMessage());
@@ -51,7 +52,6 @@ public class RegisterController {
         Map<String, Object> response = new HashMap<>();
         response.put("logout", "Logout Successfull");
         return ResponseEntity.ok(response);
-
     }
 
     @GetMapping("/profile")
@@ -77,10 +77,7 @@ public class RegisterController {
         Register profileImage = registerService.userProfile(userId);
         byte[] imageFile = profileImage.getImage();
         String contentType = detectImageType(imageFile);
-        return ResponseEntity.ok()
-                .contentType(MediaType.valueOf(contentType))
-                .body(imageFile);
-
+        return ResponseEntity.ok().contentType(MediaType.valueOf(contentType)).body(imageFile);
     }
 
     private String detectImageType(byte[] imageBytes) {
@@ -95,9 +92,3 @@ public class RegisterController {
         }
     }
 }
-
-
-
-
-
-

@@ -56,7 +56,7 @@ public class MarkController {
     @GetMapping("/teacherReport")
     public ResponseEntity<List<Map<String, Object>>> teacherReport(HttpSession session) {
         try {
-            Long userId = (Long) session.getAttribute("userId");
+            Long userId = (Long) session.getAttribute("userId") ;
             System.out.println("User ID from session: " + userId);
             if (userId == null) {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

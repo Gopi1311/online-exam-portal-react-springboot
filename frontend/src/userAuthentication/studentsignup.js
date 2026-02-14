@@ -46,12 +46,13 @@ function StudentSignup() {
       formData.append("image", file);
       console.log(formData);
       // Axios.post('http://localhost:8081/Signup',formData)
-      Axios.post("http://localhost:8081/auth/Signup", formData, {
+      Axios.post("http://localhost:8081/auth/signup", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       })
         .then((res) => {
+          alert("Signup Successful");
           navigate("/login");
         })
         .catch((err) => console.log(err));

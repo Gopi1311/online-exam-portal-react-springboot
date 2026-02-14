@@ -3,7 +3,7 @@ package com.OnlineExamSystem.demo.service;
 import com.OnlineExamSystem.demo.model.Register;
 import com.OnlineExamSystem.demo.repo.RegisterRepo;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,11 +13,10 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class RegisterService {
 
-    @Autowired
-    private RegisterRepo registerRepo;
-
+    private final RegisterRepo registerRepo;
 
     public Register userSignup(Register register, MultipartFile imageFile) throws IOException {
         if (imageFile != null && !imageFile.isEmpty()) {
@@ -25,7 +24,6 @@ public class RegisterService {
         } else {
             register.setImage(null); // Ensure image is null if not uploaded
         }
-
         return registerRepo.save(register);
     }
 
@@ -47,7 +45,6 @@ public class RegisterService {
         } else {
             throw new RuntimeException("User Not Found");
         }
-
     }
 
     public Register userProfile(Long userId) {

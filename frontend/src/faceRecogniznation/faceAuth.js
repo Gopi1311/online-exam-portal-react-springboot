@@ -9,6 +9,8 @@ const FacialRecognition = () => {
   const [modelsLoaded, setModelsLoaded] = useState(false);
   const [imageSrc, setImageSrc] = useState(null);
   const { id } = useParams();
+  console.log("id :",id );
+  
   const navigate = useNavigate();
   // Load FaceAPI models
   useEffect(() => {
@@ -31,7 +33,7 @@ const FacialRecognition = () => {
   // Fetch the profile image from the backend
   useEffect(() => {
     axios
-      .get(`http://localhost:8081/auth/image`, { responseType: "blob" })
+      .get(`http://localhost:8081/auth/image/2`, { responseType: "blob" })
       .then((response) => {
         const imageURL = URL.createObjectURL(response.data);
         setImageSrc(imageURL);

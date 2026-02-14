@@ -32,7 +32,7 @@ function TeacherSignup() {
         "register",
         new Blob([JSON.stringify(values)], { type: "application/json" })
       );
-      Axios.post("http://localhost:8081/auth/Signup", formData, {
+      Axios.post("http://localhost:8081/auth/signup", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
